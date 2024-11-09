@@ -14,7 +14,8 @@ The program expects to only receive 4 input arguments:<br>
 
 Usage example:<br>
 `LBEParser.exe 0.632 input.lua 2 0`<br>
-This compiles `input.lua` with O2 and g0, using Luau 0.632.
+This compiles `input.lua` with O2 and g0, using Luau 0.632.<br>
+This then gets parsed and output as HTML data in Standard Output (stdout).
 
 ## Requirements
 For LBEParser to properly compile any code, it needs to have access to all the different Luau compilers.<br>
