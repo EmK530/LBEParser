@@ -1,6 +1,4 @@
-﻿#pragma warning disable CS8604
-#pragma warning disable CS8618
-#pragma warning disable IL2026
+#pragma warning disable CS8604,CS8618,IL2026
 
 using System;
 using System.Collections.Generic;
@@ -573,13 +571,15 @@ public class LuauScript
                     }
                 case LuauOpcode.LOP_FASTCALL3:
                     {
-                        gen.RawOut(Luau.INSN_A(inst) + " ");
+                        uint funId = Luau.INSN_A(inst);
+                        gen.RawOut(funId + " ");
                         gen.BeginRegister();
                         gen.RawOut(Luau.INSN_B(inst) + " ");
                         SafeLabel(loop + (int)Luau.INSN_C(inst) + 1, ref gen, ref labels);
                         uint aux = code[++loop];
                         gen.RawOut($"{aux & 0xFF} {(aux >> 8) & 0xFF} ");
                         gen.EndDiv();
+                        gen.AddComment(((LuauBuiltinFunction)funId).ToString(), false);
                         break;
                     }
                 case LuauOpcode.LOP_GETVARARGS:
@@ -598,9 +598,11 @@ public class LuauScript
                     }
                 case LuauOpcode.LOP_FASTCALL:
                     {
-                        gen.RawOut(Luau.INSN_A(inst) + " ");
+                        uint funId = Luau.INSN_A(inst);
+                        gen.RawOut(funId + " ");
                         SafeLabel(loop + (int)Luau.INSN_C(inst) + 2, ref gen, ref labels);
                         gen.EndDiv();
+                        gen.AddComment(((LuauBuiltinFunction)funId).ToString(),false);
                         break;
                     }
                 case LuauOpcode.LOP_COVERAGE:
@@ -634,16 +636,19 @@ public class LuauScript
                     }
                 case LuauOpcode.LOP_FASTCALL1:
                     {
-                        gen.RawOut(Luau.INSN_A(inst) + " ");
+                        uint funId = Luau.INSN_A(inst);
+                        gen.RawOut(funId + " ");
                         gen.BeginRegister();
                         gen.RawOut(Luau.INSN_B(inst) + " ");
                         SafeLabel(loop + (int)Luau.INSN_C(inst) + 2, ref gen, ref labels);
                         gen.EndDiv();
+                        gen.AddComment(((LuauBuiltinFunction)funId).ToString(), false);
                         break;
                     }
                 case LuauOpcode.LOP_FASTCALL2:
                     {
-                        gen.RawOut(Luau.INSN_A(inst) + " ");
+                        uint funId = Luau.INSN_A(inst);
+                        gen.RawOut(funId + " ");
                         gen.BeginRegister();
                         gen.RawOut(Luau.INSN_B(inst) + " ");
                         SafeLabel(loop + (int)Luau.INSN_C(inst) + 1, ref gen, ref labels);
@@ -651,11 +656,13 @@ public class LuauScript
                         gen.BeginRegister();
                         gen.RawOut(aux + " ");
                         gen.EndDiv();
+                        gen.AddComment(((LuauBuiltinFunction)funId).ToString(), false);
                         break;
                     }
                 case LuauOpcode.LOP_FASTCALL2K:
                     {
-                        gen.RawOut(Luau.INSN_A(inst) + " ");
+                        uint funId = Luau.INSN_A(inst);
+                        gen.RawOut(funId + " ");
                         gen.BeginRegister();
                         gen.RawOut(Luau.INSN_B(inst) + " ");
                         SafeLabel(loop + (int)Luau.INSN_C(inst) + 1, ref gen, ref labels);
@@ -663,7 +670,7 @@ public class LuauScript
                         gen.BeginConstant();
                         gen.RawOut(aux + " ");
                         gen.EndDiv();
-                        gen.AddComment(p.k[aux]);
+                        gen.AddComment(((LuauBuiltinFunction)funId).ToString() + ", '"+p.k[aux].ToString()+"'",false);
                         break;
                     }
                 case LuauOpcode.LOP_JUMPXEQKNIL:
@@ -681,6 +688,30 @@ public class LuauScript
                         bool flip = (AUX >> 31) == 1 ? false : true;
                         if(!flip)
                             gen.RawOut("NOT ");
+                        gen.EndDiv();
+                        gen.AddComment(p.k[ki]);
+                        break;
+                    }
+                case LuauOpcode.LOP_IDIV:
+                    {
+                        gen.BeginRegister();
+                        gen.RawOut(Luau.INSN_A(inst) + " ");
+                        gen.BeginRegister();
+                        gen.RawOut(Luau.INSN_B(inst) + " ");
+                        gen.BeginRegister();
+                        gen.RawOut(Luau.INSN_C(inst) + " ");
+                        gen.EndDiv();
+                        break;
+                    }
+                case LuauOpcode.LOP_IDIVK:
+                    {
+                        gen.BeginRegister();
+                        gen.RawOut(Luau.INSN_A(inst) + " ");
+                        gen.BeginRegister();
+                        gen.RawOut(Luau.INSN_B(inst) + " ");
+                        gen.BeginConstant();
+                        uint ki = Luau.INSN_C(inst);
+                        gen.RawOut(ki + " ");
                         gen.EndDiv();
                         gen.AddComment(p.k[ki]);
                         break;
@@ -710,6 +741,8 @@ public class LuauScript
                 case LuauOpcode.LOP_JUMPBACK:
                 case LuauOpcode.LOP_JUMPIF:
                 case LuauOpcode.LOP_JUMPIFNOT:
+                case LuauOpcode.LOP_FORNPREP:
+                case LuauOpcode.LOP_FORNLOOP:
                     {
                         int target = loop + Luau.INSN_D(inst) + 1;
                         //debug("Found a jump on ", loop, " - ", target);
