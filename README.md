@@ -1,6 +1,7 @@
 # LBEParser
 A CLI that I created to make an updated version of lonegladiator's [Luau Bytecode Explorer](https://luau.lonegladiator.dev)<br>
-<b>This has since been removed to respect lonegladiator's wishes, the code in this repo will be archived as it is still my own.</b><br><br>
+<b>This has since been removed to respect lonegladiator's wishes, if you want to use this parser on their website I've made this bookmark:</b><br>
+`javascript: if(typeof zp=='undefined'){const o=window.fetch;window.fetch=function(u,o2){if(u.includes("/lbe/compile")){u="https://api.emk530.net/lbe/compile"};return o(u,o2);};zp=true}else{alert("You've already patched the website!");};`<br><br>
 This program will compile an input Luau script into binary, parse it and convert into HTML data compatible with LBE.
 
 ## Support
